@@ -1,73 +1,99 @@
 # AI Performance for Autonomous eVTOL Battery Prognostics
 
-## Project Overview
+**Project Status: Partial Replication — Work in Progress**
 
-This repository documents an ongoing replication and evaluation study of AI-based battery prognostics for electric Vertical Take-Off and Landing (eVTOL) systems. The research examines the potential implications of battery prognostics for autonomous Urban Air Mobility (UAM) in Indonesia.
+## 1. Project Overview
 
-The study uses the CMU eVTOL Battery Dataset and refers to the published benchmark by Yan and Wiston, Mission-Phase Feature Learning for eVTOL Li-Ion Battery Prognostics: A Leakage-Safe Cell-Held-Out Benchmark for SOC, SOH, and RUL.
+This repository documents an ongoing partial replication and evaluation of AI-based battery prognostics for electric Vertical Take-Off and Landing (eVTOL) systems. The research examines machine learning performance and its potential implications for autonomous Urban Air Mobility (UAM) in Indonesia.
 
-## Research Objectives
+The project uses the CMU eVTOL Battery Dataset and refers to the published benchmark by Yan and Wiston (2026), *Mission-Phase Feature Learning for eVTOL Li-Ion Battery Prognostics: A Leakage-Safe Cell-Held-Out Benchmark for SOC, SOH, and RUL*.
 
-The objectives of this project are to:
+The replication is still in progress. The implementation and results have not yet been fully verified against all methods, evaluation protocols, and reported findings in the reference paper.
 
-- Examine machine learning and deep learning approaches for eVTOL battery prognostics.
-- Evaluate model performance for State of Charge (SOC), State of Health (SOH), and Remaining Useful Life (RUL), as experiments are completed.
-- Investigate generalization across battery cells and the importance of reliable evaluation protocols.
-- Discuss the technical and operational considerations for potential autonomous eVTOL applications in Indonesia.
+## 2. Research Objectives
 
-## Dataset
+This project aims to:
 
-The study uses the CMU eVTOL Battery Dataset as the primary data source.
+- Examine conventional machine learning and sequential learning approaches for eVTOL battery prognostics.
+- Investigate State of Charge (SOC), State of Health (SOH), and Remaining Useful Life (RUL) prediction.
+- Evaluate model performance using metrics such as Mean Absolute Error (MAE) and Root Mean Squared Error (RMSE).
+- Examine generalization across battery cells and the importance of leakage-safe evaluation.
+- Discuss the technical and operational considerations for potential autonomous eVTOL-based UAM applications in Indonesia.
 
-The dataset provides battery measurements under flight-related and charging conditions. Its use in this project follows the research scope of the reference benchmark.
+## 3. Dataset and Reference Study
 
-Dataset files are not necessarily redistributed in this repository. Please refer to the original dataset source and its applicable access and usage conditions.
+### Dataset
 
-## Reference Study
+The project uses the CMU eVTOL Battery Dataset as its primary data source. The dataset contains battery measurements collected under flight-related and charging conditions.
 
-Yan, S., & Wiston, M. (2026). Mission-Phase Feature Learning for eVTOL Li-Ion Battery Prognostics: A Leakage-Safe Cell-Held-Out Benchmark for SOC, SOH, and RUL. Batteries, 12, 322.
+Dataset source:  
+https://kilthub.cmu.edu/articles/dataset/eVTOL_Battery_Dataset/14226830
 
-DOI: https://doi.org/10.3390/batteries12090322
+Dataset access and redistribution are subject to the original dataset's licensing and usage conditions.
 
-The reference study is used to guide the replication process and interpret the experimental findings. Results reported in the reference paper are distinguished from results independently obtained in this project.
+### Reference Study
 
-## Methodology
+Yan, S., & Wiston, M. (2026). *Mission-Phase Feature Learning for eVTOL Li-Ion Battery Prognostics: A Leakage-Safe Cell-Held-Out Benchmark for SOC, SOH, and RUL*. Batteries, 12, 322.
 
-The planned workflow includes:
+https://doi.org/10.3390/batteries12090322
+
+The reference study provides the methodological basis for the replication. Results reported in the publication are distinguished from results independently obtained in this repository.
+
+## 4. Experimental Scope
+
+The experimental workflow includes:
 
 1. Dataset inspection and preprocessing.
-2. Construction and verification of battery prognostic targets.
-3. Implementation of selected machine learning and deep learning models.
-4. Model evaluation using appropriate prediction metrics.
-5. Assessment of generalization across battery cells where implemented.
-6. Comparison with the reference benchmark and discussion of implications for UAM in Indonesia.
+2. Construction and verification of prognostic targets.
+3. Implementation and evaluation of selected machine learning and sequential models.
+4. Calculation of prediction errors using appropriate evaluation metrics.
+5. Examination of performance across individual battery cells.
+6. Comparison with the reference benchmark, where the methods and evaluation protocols are sufficiently aligned.
 
-The implementation of these steps is ongoing. The repository will document the methods and experiments that have actually been completed.
+Experiments and verification are ongoing. The completeness of each task is documented separately rather than assuming that all three prognostic tasks have been fully replicated.
 
-## Replication Status
+## 5. Current Replication Status
 
-*Status: Work in Progress*
+### State of Health (SOH)
 
-This project has not yet fully replicated all experiments and results reported in the reference study.
+SOH experiments have been executed, including leave-one-cell-out evaluation across 19 battery cells. The available notebook contains training logs and model evaluation outputs, including MAE and RMSE.
 
-The scope and completeness of the replication will be updated as implementation, validation, and result verification progress. Any reported findings will be identified according to whether they originate from the reference paper or from experiments independently conducted in this repository.
+However, the experimental results still require systematic verification against the reference paper's data processing, target construction, model configuration, and evaluation protocol.
 
-## Repository Structure
+### State of Charge (SOC)
 
-- data/: Dataset documentation and information about data access.
-- notebooks/: Experimental notebooks for battery prognostics tasks.
-- results/tables/: Verified experimental result tables.
-- results/figures/: Visualizations generated from experimental results.
-- docs/methodology.md: Detailed experimental methodology.
-- docs/replication_status.md: Replication progress and outstanding tasks.
-- docs/references.md: Research references used in the project.
+SOC-related code and visualizations are present in the research workflow. The extent to which these experiments reproduce the reference methodology and results remains to be verified.
 
-## Limitations
+### Remaining Useful Life (RUL)
 
-The findings are limited by the experiments completed and verified at each stage. Experimental results alone do not establish operational readiness for autonomous eVTOL systems or validate performance under real-world Indonesian flight conditions.
+RUL-related code, tables, and evaluation outputs are present. Further checks are needed to verify target construction, threshold definitions, evaluation procedures, and consistency with the reference benchmark.
 
-Further verification, broader operational data, and appropriate safety assessments would be required before practical deployment could be considered.
+**Overall status:** Partial replication. The presence of code or output for a task does not by itself establish that its full experimental procedure and published results have been reproduced.
 
-## Research Context
+## 6. Repository Structure
 
-This repository supports academic research into AI-based battery prognostics. It is intended to improve transparency regarding experimental methods, replication progress, model performance, and the limitations of the available evidence.
+The repository is intended to organize the research materials as follows:
+
+- `data/`: Dataset documentation and information about data access.
+- `notebooks/`: Experimental notebooks and analysis.
+- `results/tables/`: Verified experimental result tables.
+- `results/figures/`: Visualizations generated from experimental outputs.
+- `docs/methodology.md`: Experimental methodology and evaluation procedures.
+- `docs/replication_status.md`: Progress and outstanding verification tasks.
+- `docs/references.md`: Reference papers and dataset sources.
+
+Only files that are available and relevant to the project will be included. The repository structure will be updated as the project develops.
+
+## 7. Reproducibility and Limitations
+
+Reproducing the reference study requires consistency in dataset processing, feature construction, target definitions, model settings, and validation procedures. Differences in these components may lead to results that differ from those reported in the publication.
+
+The current work should therefore be interpreted as an ongoing partial replication rather than a complete reproduction of the reference benchmark.
+
+Experimental results do not establish operational readiness for autonomous eVTOL systems or validate battery prognostics under real-world Indonesian flight conditions. Further verification, representative operational data, and appropriate safety assessments are needed before practical deployment can be considered.
+
+## 8. Research Contribution
+
+This repository aims to make the replication process more transparent by documenting experimental procedures, available outputs, differences from the reference benchmark, and remaining limitations.
+
+Its longer-term goal is to support a more rigorous assessment of AI-based battery prognostics and the requirements for potential autonomous eVTOL-based UAM applications in Indonesia.
