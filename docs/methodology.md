@@ -183,4 +183,3 @@ Implications for autonomous urban air mobility in Indonesia should therefore be 
 1. *Mission-Phase Feature Learning for eVTOL Li-Ion Battery Prognostics: A Leakage-Safe Cell-Held-Out Benchmark for SOC, SOH, and RUL.* Batteries, 12(9), 322. DOI: [10.3390/batteries12090322](https://doi.org/10.3390/batteries12090322).
 
 2. CMU eVTOL Battery Dataset. Refer to the original dataset repository or publication for dataset details, documentation, and usage conditions.
-3.
