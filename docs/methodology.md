@@ -1,185 +1,270 @@
 # Research Methodology
 
-## 1. Overview
+## 1. Research Overview
 
-This repository investigates the performance of artificial intelligence (AI) models for electric vertical take-off and landing (eVTOL) battery prognostics, with implications for autonomous urban air mobility (UAM) in Indonesia.
+This repository documents a quantitative comparative study of artificial intelligence (AI) pipelines for lithium-ion battery prognostics in electric Vertical Take-Off and Landing (eVTOL) applications.
 
-The study focuses on battery state estimation and remaining useful life prediction. It uses the CMU eVTOL Battery Dataset and refers to the published study:
+The study evaluates two prognostic tasks: **State of Health (SOH) prediction five missions ahead** and **Remaining Useful Life (RUL) estimation** at SOH thresholds of 90%, 85%, and 80%.
 
-*Mission-Phase Feature Learning for eVTOL Li-Ion Battery Prognostics: A Leakage-Safe Cell-Held-Out Benchmark for SOC, SOH, and RUL.*
+The research builds upon the eVTOL battery dataset described by Bills et al. (2023) and the mission-phase prognostics benchmark developed by Yan and Wiston (2026).
 
-The current repository represents a **partial replication and ongoing experimental analysis**. Results are documented according to the experiments that have actually been conducted and verified.
+Its primary contribution is an expanded evaluation of prediction accuracy, generalization across unseen battery cells, statistical differences between pipelines, and prediction errors under different battery health conditions.
 
-## 2. Dataset
+The study does not introduce a new model architecture or claim to establish operational readiness for Urban Air Mobility (UAM) in Indonesia.
 
-### 2.1 Data Source
+## 2. Dataset and Target Construction
 
-The experiments use the CMU eVTOL Battery Dataset.
+### 2.1 Data Sources
 
-The dataset is intended to support research into battery behavior and prognostics under eVTOL-related operating conditions.
+The experimental analysis uses reconstructed mission-level data associated with the eVTOL lithium-ion battery dataset and the reference benchmark.
 
-Researchers should consult the original dataset documentation for information about its structure, experimental conditions, variables, and usage restrictions.
+**Original dataset:**
 
-### 2.2 Data Preparation
+https://kilthub.cmu.edu/articles/dataset/eVTOL_Battery_Dataset/14226830
 
-Data preparation should be performed before model training and evaluation.
+**Reference benchmark:**
 
-The preparation process may include:
+https://github.com/MusaWiston/Mission-Phase-Feature-Learning-for-eVTOL-Battery-Prognostics-with-ML
 
-- Inspecting the available files and data structure.
-- Checking for missing, invalid, or inconsistent observations.
-- Applying documented data-quality filtering criteria.
-- Identifying battery cells and relevant mission or operational information.
-- Constructing model inputs and target variables.
-- Recording any exclusions and preprocessing decisions.
+The original dataset, benchmark implementation, and research outputs must be distinguished when documenting data provenance.
 
-The exact preprocessing steps must be documented alongside the corresponding notebook or experiment. No filtering rule should be assumed to have been applied unless it is implemented and verified in the code.
+### 2.2 SOH Prediction Target
 
-## 3. Prognostic Tasks
+The SOH task predicts battery health **five missions ahead**.
 
-The reference study considers three battery prognostic tasks.
+The evaluation includes **18,513 observations from 19 battery cells**.
 
-### 3.1 State of Charge (SOC)
+Prediction errors are expressed in SOH percentage points.
 
-State of Charge estimation concerns the estimation of the battery's current charge level.
+### 2.3 RUL Prediction Targets
 
-The implementation, target definition, input features, and evaluation results for SOC must be documented when the corresponding experiment has been verified.
+RUL is defined as the remaining number of missions until a specified SOH threshold is reached.
 
-### 3.2 State of Health (SOH)
+Three thresholds are evaluated:
 
-State of Health estimation concerns the assessment of battery condition relative to an appropriate reference state.
+| Target | Observations | Battery cells |
+|---|---:|---:|
+| RUL90 | 5,814 | 19 |
+| RUL85 | 9,595 | 16 |
+| RUL80 | 8,257 | 8 |
 
-The repository includes SOH-related model evaluation. The current analysis compares machine learning models using error-based evaluation metrics.
+The evaluation populations differ across thresholds. Consequently, error values from different RUL targets should not be interpreted as a controlled comparison of intrinsic prediction difficulty.
 
-The specific target construction, feature set, training procedure, and validation strategy should be recorded in the corresponding notebook.
+### 2.4 Scope of SOC
 
-### 3.3 Remaining Useful Life (RUL)
+State of Charge (SOC) estimation is included in the reference benchmark by Yan and Wiston (2026).
 
-Remaining Useful Life prediction estimates the remaining operational life of a battery relative to a defined end-of-life criterion.
+However, **SOC is not included in the final comparative results reported in this study**. No SOC performance claims are made in the associated manuscript.
 
-RUL evaluation depends on the selected threshold, the definition of a mission or operational cycle, and the method used to calculate remaining life.
+## 3. Model Pipelines
 
-The threshold definitions and evaluation procedures must be explicitly documented in the relevant experiment.
+### 3.1 SOH Prediction
 
-## 4. Data Quality and Filtering
+Six pipelines are evaluated:
 
-Data-quality filtering is used to identify observations that may be unsuitable for analysis.
+1. Random Forest
+2. XGBoost
+3. LightGBM
+4. CatBoost
+5. Mission-Phase Transformer
+6. Attention-LSTM-Mixture of Experts (Attention-LSTM-MoE)
 
-The filtering criteria should be defined before model evaluation and documented in the relevant notebook or results table.
+The four tree-based pipelines use **30 mission-level tabular features**.
 
-For reproducibility, each filtering rule should specify:
+The two sequential pipelines use **20 features per mission**, with input histories of up to **20 missions**.
 
-- The condition being checked.
-- The reason for applying the rule.
-- The number of observations or records affected, where available.
-- Whether the rule is applied consistently across training and evaluation data.
+All six SOH pipelines are evaluated against the same prediction target and held-out evaluation population.
 
-Filtering decisions should not use information from the evaluation targets in a way that introduces data leakage.
+Because the feature representations differ between pipeline families, the comparison does not isolate the effect of model architecture alone.
 
-## 5. Model Development and Evaluation
+### 3.2 RUL Prediction
 
-The repository investigates AI and machine learning approaches for battery prognostics.
+Two sequential models are evaluated for RUL:
 
-Models should be trained and evaluated using a documented experimental procedure. Model comparisons should use consistent target definitions, data splits, and evaluation metrics wherever applicable.
+- Mission-Phase Transformer
+- Attention-LSTM-MoE
 
-For each experiment, the following information should be recorded:
+Both are evaluated separately for RUL90, RUL85, and RUL80.
 
-1. Model name and implementation.
-2. Input features and target variable.
-3. Training and evaluation data.
-4. Validation or holdout strategy.
-5. Model parameters and relevant configuration.
-6. Evaluation metrics.
-7. Random seeds and software dependencies, where applicable.
+No RUL performance comparison involving Random Forest, XGBoost, LightGBM, or CatBoost is claimed in the final analysis.
 
-The models and configurations reported in the results must correspond to the implementations used in the experiments.
+## 4. Data Preparation and Leakage Control
 
-## 6. Cell-Held-Out Evaluation and Data Leakage
+The study uses mission-level feature representations and reconstructed experimental artifacts.
 
-Battery datasets may contain observations from multiple cells. Evaluation procedures should account for the possibility that observations from the same cell share characteristics.
+Data preparation and feature construction must preserve the temporal relationship between prediction inputs and future targets.
 
-Where a cell-held-out evaluation is implemented, the held-out cell must not contribute observations to model training.
+For cell-held-out evaluation, any preprocessing parameter learned from data, such as an imputation statistic, must be estimated using training data only.
 
-Preprocessing operations that learn parameters from data, such as feature scaling or imputation, should be fitted using training data only and then applied to the held-out data.
+The available tree-pipeline configuration documents a training-fold median-imputation procedure.
 
-Any feature construction or filtering procedure must be reviewed to ensure that information unavailable at prediction time is not inadvertently used.
+Prediction artifacts were also reviewed for features that could directly reveal future targets. An alternative CatBoost result involving target-related leakage features was excluded from the primary comparison.
 
-The repository should distinguish between procedures confirmed to be implemented and procedures that remain to be verified against the reference study.
+Only the retained CatBoost prediction results are included in the reported analysis.
 
-## 7. Evaluation Metrics
+Not every training-time configuration or intermediate preprocessing operation has been independently reconstructed from the available artifacts. Such details should not be inferred where supporting records are unavailable.
 
-The repository uses error-based metrics for model evaluation where applicable.
+## 5. Leave-One-Cell-Out Evaluation
 
-### 7.1 Mean Absolute Error (MAE)
+The study adopts a **Leave-One-Cell-Out (LOCO)** evaluation protocol.
 
-MAE measures the average absolute difference between predicted and reference values.
+For each evaluation fold:
 
-Lower MAE indicates smaller average absolute prediction errors.
+1. One battery cell is designated as the held-out test cell.
+2. The remaining cells provide the training data.
+3. The model generates predictions for the held-out cell.
+4. Prediction errors are calculated and associated with that cell.
+5. The procedure is repeated across eligible cells.
 
-### 7.2 Root Mean Squared Error (RMSE)
+This protocol evaluates generalization to cells not represented in the corresponding training fold.
 
-RMSE measures the square root of the average squared prediction errors.
+LOCO reduces within-cell overlap between training and evaluation, but it does not by itself establish generalization to new battery chemistries, battery packs, aircraft, or operating environments.
 
-Because errors are squared before averaging, RMSE places greater emphasis on larger errors than MAE does.
+## 6. Evaluation Metrics
 
-### 7.3 Additional Error Analysis
+### 6.1 Pooled MAE and RMSE
 
-Where implemented, results may also include cell-level comparisons, error distributions, or high-percentile error statistics.
+**Mean Absolute Error (MAE)** measures the average absolute prediction error across evaluated observations.
 
-These analyses help identify variation in model performance across battery cells and reveal whether average performance conceals larger errors in particular cases.
+**Root Mean Squared Error (RMSE)** gives greater weight to larger prediction errors.
 
-The reported metrics should always be interpreted in the context of the target variable, its units, and the evaluation procedure.
+Both metrics are calculated separately for each model and prediction target.
 
-## 8. Results and Reporting
+### 6.2 Cell-Level Error Metrics
 
-Experimental results are organized into tables, figures, and supporting notebooks.
+The study additionally evaluates:
 
-Each reported result should identify:
+- **Cell-level MAE:** MAE calculated separately for each held-out battery cell.
+- **Macro-MAE:** The unweighted mean of cell-level MAE values.
+- **Worst-cell MAE:** The highest MAE observed among the evaluated cells.
+- **Cell-level error distributions:** Variation in prediction performance across held-out cells.
 
-- The task being evaluated.
-- The model or experimental configuration.
-- The evaluation dataset or held-out cells.
-- The metric and its units.
-- Whether the value comes from the published reference study or an independent run in this repository.
+These metrics complement pooled results, which may be influenced by unequal numbers of observations across cells.
 
-Reference-study results and independently reproduced results must be clearly distinguished.
+## 7. Statistical Analysis
 
-Differences between the reference values and independent runs should be investigated rather than silently replaced or treated as equivalent.
+### 7.1 SOH Pipeline Comparisons
 
-## 9. Reproducibility
+LightGBM is used as a post-hoc exploratory reference because it achieved the lowest pooled SOH MAE.
 
-To support reproducibility, the repository should contain the relevant notebooks, dependency information, result files, and methodological documentation.
+Paired Wilcoxon signed-rank tests compare cell-level MAE values between LightGBM and each of the five other pipelines.
 
-A reproducible experiment should provide enough information to identify the data inputs, preprocessing steps, model configuration, evaluation procedure, and output metrics.
+The Holm procedure adjusts for multiple comparisons.
 
-Dataset access instructions and any applicable data-use restrictions should be followed.
+The unit of paired statistical analysis is the **battery cell**, not the individual mission observation.
 
-Results should not be described as fully reproduced until the corresponding procedure has been independently executed and checked.
+Because the reference pipeline was selected after inspecting the results, statistical conclusions are interpreted as exploratory.
 
-## 10. Current Replication Status
+### 7.2 SOH Degradation-Strata Analysis
 
-This repository is a work in progress.
+Prediction errors are compared between:
 
-The current status should be reported separately for each task:
+- **Low SOH:** below 85%.
+- **High SOH:** at least 95%.
 
-- **SOH:** Model evaluation has been explored; the full procedure and results require systematic verification.
-- **SOC:** The implementation and results require verification before replication can be claimed.
-- **RUL:** Threshold definitions, evaluation procedures, and results require verification before replication can be claimed.
+The paired analysis includes **16 cells** with observations in both strata.
 
-These status descriptions should be updated as the experiments are checked and completed.
+For each pipeline, the difference is calculated as:
 
-## 11. Limitations
+**ΔMAE = MAE at low SOH − MAE at high SOH**
 
-The findings depend on the dataset, feature construction, model configurations, and evaluation procedures used in the experiments.
+A positive value indicates higher prediction error in the low-SOH stratum.
 
-Performance on the available dataset does not, by itself, establish that a model is ready for deployment in an autonomous eVTOL aircraft.
+Paired Wilcoxon tests and Holm correction are applied across the six pipelines.
 
-Further validation would be needed to assess robustness under different operating conditions, battery aging patterns, and real-world flight missions.
+These comparisons are observational and do not establish a causal relationship between degradation and prediction error.
 
-Implications for autonomous urban air mobility in Indonesia should therefore be discussed as research implications rather than as evidence of operational readiness.
+### 7.3 RUL Model Comparisons
 
-## 12. References
+The two sequential models are compared using paired cell-level MAE values for each RUL threshold.
 
-1. *Mission-Phase Feature Learning for eVTOL Li-Ion Battery Prognostics: A Leakage-Safe Cell-Held-Out Benchmark for SOC, SOH, and RUL.* Batteries, 12(9), 322. DOI: [10.3390/batteries12090322](https://doi.org/10.3390/batteries12090322).
+Three Wilcoxon tests are performed, with Holm correction across the thresholds.
 
-2. CMU eVTOL Battery Dataset. Refer to the original dataset repository or publication for dataset details, documentation, and usage conditions.
+The difference is defined as:
+
+**ΔMAE = MAE of Transformer − MAE of Attention-LSTM-MoE**
+
+Positive differences favor Attention-LSTM-MoE, while negative differences favor Mission-Phase Transformer.
+
+Cell-level bootstrap confidence intervals are used where available to characterize uncertainty.
+
+Statistically nonsignificant differences are not interpreted as evidence of model equivalence.
+
+## 8. Experimental Findings
+
+### 8.1 SOH Results
+
+LightGBM achieved the lowest pooled SOH MAE of **0.525 percentage points**.
+
+However, Random Forest achieved a lower worst-cell MAE than LightGBM.
+
+After Holm correction, LightGBM differed significantly from Mission-Phase Transformer and Attention-LSTM-MoE, but not from XGBoost, Random Forest, or CatBoost.
+
+### 8.2 SOH Degradation Analysis
+
+All four tree-based pipelines exhibited significantly higher cell-level MAE in the low-SOH stratum than in the high-SOH stratum.
+
+The two sequential pipelines did not show statistically significant differences between the evaluated strata.
+
+These results do not establish that the sequential models are unaffected by battery degradation.
+
+### 8.3 RUL Results
+
+The preferred model varies by threshold and evaluation metric.
+
+After Holm correction, no statistically significant cell-level MAE difference was identified between Mission-Phase Transformer and Attention-LSTM-MoE for RUL90, RUL85, or RUL80.
+
+RUL80 results require particular caution because only eight cells were eligible for evaluation.
+
+## 9. Reproducibility and Research Artifacts
+
+The experimental notebook is intended to document data reconstruction, model evaluation, and statistical analysis.
+
+The repository should distinguish among:
+
+- Original third-party datasets.
+- Reference benchmark code and methods.
+- Reconstructed experimental data.
+- Model prediction artifacts.
+- Independently calculated evaluation metrics.
+- Tables and figures prepared for the manuscript.
+
+Reproducing the reported metrics requires access to the appropriate datasets, model outputs, preprocessing configurations, and evaluation procedures.
+
+The presence of a notebook and saved predictions does not, by itself, prove that every training pipeline can be reproduced end-to-end from a clean environment.
+
+The repository should document any external Google Drive dependencies, unavailable files, and configuration details that remain unverified.
+
+## 10. Replication Status
+
+**SOH:** Comparative prediction metrics, cell-level analyses, and statistical comparisons have been obtained and checked against the available experimental outputs. Complete independent verification of every training configuration remains limited by the available artifacts.
+
+**RUL:** Results for RUL90, RUL85, and RUL80, including paired statistical comparisons, have been obtained and analyzed. The eligible evaluation population differs by threshold.
+
+**SOC:** Not included in the final experimental claims of this study.
+
+**Operational deployment:** Not evaluated.
+
+The project is therefore described as a **secondary comparative analysis and partial experimental reproduction**, rather than a fully independent reimplementation of every component in the reference benchmark.
+
+## 11. Research Limitations
+
+The analysis depends on secondary data and reconstructed experimental artifacts.
+
+The tree-based and sequential pipelines use different feature representations, limiting architecture-specific conclusions.
+
+The eligible number of cells differs across RUL thresholds, especially for RUL80.
+
+The study does not validate predictions at the battery-pack level or within an operational eVTOL battery management system.
+
+No Indonesian flight-operation dataset or aviation certification assessment is included.
+
+Accordingly, implications for UAM in Indonesia are prospective and should not be interpreted as evidence of commercial or safety-critical deployment readiness.
+
+## 12. References and Attribution
+
+**Bills et al. (2023).** eVTOL lithium-ion battery dataset. *Scientific Data*. https://doi.org/10.1038/s41597-023-02180-5
+
+**Yan, S., & Wiston, M. (2026).** Mission-Phase Feature Learning for eVTOL Li-Ion Battery Prognostics: A Leakage-Safe Cell-Held-Out Benchmark for SOC, SOH, and RUL. *Batteries, 12*(9), 322. https://doi.org/10.3390/batteries12090322
+
+Original datasets and reference implementations remain subject to their respective licenses and attribution requirements.
