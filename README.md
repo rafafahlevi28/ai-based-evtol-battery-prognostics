@@ -1,99 +1,136 @@
-# AI Performance for Autonomous eVTOL Battery Prognostics
+# AI-Based eVTOL Battery Prognostics
 
-**Project Status: Partial Replication — Work in Progress**
+### Comparative Evaluation of AI Models for Battery SOH and RUL Prediction in Urban Air Mobility
 
-## 1. Project Overview
+## Overview
 
-This repository documents an ongoing partial replication and evaluation of AI-based battery prognostics for electric Vertical Take-Off and Landing (eVTOL) systems. The research examines machine learning performance and its potential implications for autonomous Urban Air Mobility (UAM) in Indonesia.
+This repository contains research materials for evaluating artificial intelligence (AI) pipelines for lithium-ion battery prognostics in electric Vertical Take-Off and Landing (eVTOL) applications.
 
-The project uses the CMU eVTOL Battery Dataset and refers to the published benchmark by Yan and Wiston (2026), *Mission-Phase Feature Learning for eVTOL Li-Ion Battery Prognostics: A Leakage-Safe Cell-Held-Out Benchmark for SOC, SOH, and RUL*.
+The study focuses on predicting **State of Health (SOH)** and **Remaining Useful Life (RUL)** using machine learning and deep learning approaches. It investigates predictive accuracy, generalization across unseen battery cells, statistical differences between models, and prediction errors under different battery degradation conditions.
 
-The replication is still in progress. The implementation and results have not yet been fully verified against all methods, evaluation protocols, and reported findings in the reference paper.
+The research is motivated by the potential development of **Urban Air Mobility (UAM) in Indonesia**, where reliable battery health monitoring may support maintenance planning and operational risk assessment.
 
-## 2. Research Objectives
+## Research Objectives
 
-This project aims to:
+This study addresses three research questions:
 
-- Examine conventional machine learning and sequential learning approaches for eVTOL battery prognostics.
-- Investigate State of Charge (SOC), State of Health (SOH), and Remaining Useful Life (RUL) prediction.
-- Evaluate model performance using metrics such as Mean Absolute Error (MAE) and Root Mean Squared Error (RMSE).
-- Examine generalization across battery cells and the importance of leakage-safe evaluation.
-- Discuss the technical and operational considerations for potential autonomous eVTOL-based UAM applications in Indonesia.
+- **RQ1:** How do six AI pipelines compare in predicting battery SOH on previously unseen battery cells?
+- **RQ2:** How do SOH prediction errors vary across battery cells and degradation conditions, and are these differences statistically significant?
+- **RQ3:** How do Mission-Phase Transformer and Attention-LSTM-MoE compare in predicting RUL at SOH thresholds of 90%, 85%, and 80%?
 
-## 3. Dataset and Reference Study
+## Dataset
 
-### Dataset
+The research builds upon the eVTOL lithium-ion battery dataset published by **Bills et al. (2023)** and the mission-phase battery prognostics benchmark developed by **Yan and Wiston (2026)**.
 
-The project uses the CMU eVTOL Battery Dataset as its primary data source. The dataset contains battery measurements collected under flight-related and charging conditions.
+Original dataset:
 
-Dataset source:  
 https://kilthub.cmu.edu/articles/dataset/eVTOL_Battery_Dataset/14226830
 
-Dataset access and redistribution are subject to the original dataset's licensing and usage conditions.
+Reference benchmark repository:
 
-### Reference Study
+https://github.com/MusaWiston/Mission-Phase-Feature-Learning-for-eVTOL-Battery-Prognostics-with-ML
 
-Yan, S., & Wiston, M. (2026). *Mission-Phase Feature Learning for eVTOL Li-Ion Battery Prognostics: A Leakage-Safe Cell-Held-Out Benchmark for SOC, SOH, and RUL*. Batteries, 12, 322.
+The SOH evaluation includes **18,513 observations from 19 battery cells**.
 
-https://doi.org/10.3390/batteries12090322
+RUL evaluation datasets vary according to the SOH threshold:
 
-The reference study provides the methodological basis for the replication. Results reported in the publication are distinguished from results independently obtained in this repository.
+| Target | Observations | Battery Cells |
+|---|---:|---:|
+| RUL90 | 5,814 | 19 |
+| RUL85 | 9,595 | 16 |
+| RUL80 | 8,257 | 8 |
 
-## 4. Experimental Scope
+The original dataset and reference benchmark remain the intellectual contributions of their respective authors. Their use must comply with the applicable licenses and attribution requirements.
 
-The experimental workflow includes:
+## Methodology
 
-1. Dataset inspection and preprocessing.
-2. Construction and verification of prognostic targets.
-3. Implementation and evaluation of selected machine learning and sequential models.
-4. Calculation of prediction errors using appropriate evaluation metrics.
-5. Examination of performance across individual battery cells.
-6. Comparison with the reference benchmark, where the methods and evaluation protocols are sufficiently aligned.
+The research adopts a quantitative comparative approach based on secondary data analysis and experimental reproduction.
 
-Experiments and verification are ongoing. The completeness of each task is documented separately rather than assuming that all three prognostic tasks have been fully replicated.
+A **Leave-One-Cell-Out (LOCO)** evaluation protocol is used to assess model generalization to battery cells excluded from training.
 
-## 5. Current Replication Status
+For SOH prediction, six AI pipelines are evaluated:
 
-### State of Health (SOH)
+1. Random Forest
+2. XGBoost
+3. LightGBM
+4. CatBoost
+5. Mission-Phase Transformer
+6. Attention-LSTM-Mixture of Experts (Attention-LSTM-MoE)
 
-SOH experiments have been executed, including leave-one-cell-out evaluation across 19 battery cells. The available notebook contains training logs and model evaluation outputs, including MAE and RMSE.
+The SOH prediction horizon is **five missions ahead**.
 
-However, the experimental results still require systematic verification against the reference paper's data processing, target construction, model configuration, and evaluation protocol.
+Tree-based pipelines use 30 mission-level tabular features, while sequential pipelines use 20 features per mission with a maximum history of 20 missions.
 
-### State of Charge (SOC)
+For RUL prediction, Mission-Phase Transformer and Attention-LSTM-MoE are evaluated at three SOH thresholds: 90%, 85%, and 80%.
 
-SOC-related code and visualizations are present in the research workflow. The extent to which these experiments reproduce the reference methodology and results remains to be verified.
+Evaluation metrics include:
 
-### Remaining Useful Life (RUL)
+- Mean Absolute Error (MAE)
+- Root Mean Squared Error (RMSE)
+- Macro-MAE across battery cells
+- Worst-cell MAE
+- Paired Wilcoxon signed-rank tests
+- Holm correction for multiple comparisons
+- Cell-level bootstrap confidence intervals
 
-RUL-related code, tables, and evaluation outputs are present. Further checks are needed to verify target construction, threshold definitions, evaluation procedures, and consistency with the reference benchmark.
+Because the tree-based and sequential pipelines use different feature representations, their results should not be interpreted as a controlled comparison of model architectures alone.
 
-**Overall status:** Partial replication. The presence of code or output for a task does not by itself establish that its full experimental procedure and published results have been reproduced.
+## Experimental Results
 
-## 6. Repository Structure
+### SOH Prediction
 
-The repository is intended to organize the research materials as follows:
+| Model | MAE | RMSE | Macro-MAE |
+|---|---:|---:|---:|
+| LightGBM | **0.525** | **0.759** | **0.545** |
+| XGBoost | 0.571 | 0.824 | 0.583 |
+| Random Forest | 0.600 | 0.852 | 0.592 |
+| CatBoost | 0.804 | 1.324 | 0.713 |
+| Mission-Phase Transformer | 1.374 | 2.254 | 1.375 |
+| Attention-LSTM-MoE | 1.434 | 2.147 | 1.488 |
 
-- `data/`: Dataset documentation and information about data access.
-- `notebooks/`: Experimental notebooks and analysis.
-- `results/tables/`: Verified experimental result tables.
-- `results/figures/`: Visualizations generated from experimental outputs.
-- `docs/methodology.md`: Experimental methodology and evaluation procedures.
-- `docs/replication_status.md`: Progress and outstanding verification tasks.
-- `docs/references.md`: Reference papers and dataset sources.
+All SOH prediction errors are expressed in percentage points.
 
-Only files that are available and relevant to the project will be included. The repository structure will be updated as the project develops.
+LightGBM achieved the lowest pooled SOH MAE. However, paired statistical tests with Holm correction identified significant differences only between LightGBM and the two sequential pipelines.
 
-## 7. Reproducibility and Limitations
+The comparisons with XGBoost, Random Forest, and CatBoost were not statistically significant.
 
-Reproducing the reference study requires consistency in dataset processing, feature construction, target definitions, model settings, and validation procedures. Differences in these components may lead to results that differ from those reported in the publication.
+### Battery Degradation Analysis
 
-The current work should therefore be interpreted as an ongoing partial replication rather than a complete reproduction of the reference benchmark.
+Prediction errors were compared between low-SOH (<85%) and high-SOH (≥95%) conditions using 16 eligible battery cells.
 
-Experimental results do not establish operational readiness for autonomous eVTOL systems or validate battery prognostics under real-world Indonesian flight conditions. Further verification, representative operational data, and appropriate safety assessments are needed before practical deployment can be considered.
+All four tree-based pipelines exhibited significantly higher cell-level prediction errors under low-SOH conditions after Holm correction.
 
-## 8. Research Contribution
+The two sequential pipelines did not show statistically significant differences between these SOH strata.
 
-This repository aims to make the replication process more transparent by documenting experimental procedures, available outputs, differences from the reference benchmark, and remaining limitations.
+These findings describe associations in the evaluated data and do not establish a causal effect of battery degradation.
 
-Its longer-term goal is to support a more rigorous assessment of AI-based battery prognostics and the requirements for potential autonomous eVTOL-based UAM applications in Indonesia.
+### RUL Prediction
+
+| Target | Model | MAE | RMSE |
+|---|---|---:|---:|
+| RUL90 | Mission-Phase Transformer | 36.869 | 67.287 |
+| RUL90 | Attention-LSTM-MoE | 37.170 | 55.169 |
+| RUL85 | Mission-Phase Transformer | 73.476 | 95.475 |
+| RUL85 | Attention-LSTM-MoE | 67.478 | 89.401 |
+| RUL80 | Mission-Phase Transformer | 175.467 | 233.326 |
+| RUL80 | Attention-LSTM-MoE | 180.636 | 222.323 |
+
+RUL prediction errors are expressed in missions.
+
+No statistically significant differences were identified between the two sequential models across the three RUL thresholds after Holm correction.
+
+The absence of statistical significance should not be interpreted as evidence of model equivalence.
+
+## Research Contributions
+
+The main contribution of this study is an expanded comparative evaluation of battery prognostics pipelines, focusing on:
+
+- Generalization to previously unseen battery cells.
+- Statistical comparisons of SOH prediction performance.
+- Cell-level prediction error distributions.
+- Prediction errors across different SOH degradation conditions.
+- RUL prediction comparisons across multiple SOH thresholds.
+
+This research does not claim to introduce a new AI architecture or a new LOCO evaluation protocol.
+
+Instead, it builds upon the reference
