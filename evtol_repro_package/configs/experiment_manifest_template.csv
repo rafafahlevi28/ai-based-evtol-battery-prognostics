@@ -1,0 +1,7 @@
+model,task,source_artifact,origin,features,preprocessing,split_protocol,hyperparameters,source_commit,sha256,verification_status
+Random Forest,SOH,random_forest_predictions.csv,LOCO experiment,30,train-fold median,LOCO,"n_estimators=250; min_samples_leaf=2; max_features=1.0; seed=42",,,partial
+XGBoost,SOH,xgboost_predictions.csv,LOCO experiment,30,train-fold median,LOCO,"n_estimators=350; max_depth=5; learning_rate=0.04; subsample=0.85; colsample_bytree=0.85; seed=42",,,partial
+LightGBM,SOH,lightgbm_predictions.csv,LOCO experiment,30,train-fold median,LOCO,"n_estimators=350; learning_rate=0.04; num_leaves=31; max_depth=-1; seed=42",,,partial
+CatBoost,SOH,catboost_predictions.csv,verified rerun,30,train-fold median,LOCO,"iterations=700; depth=7; learning_rate=0.04; seed=42",,,partial
+Mission-Phase Transformer,SOH/RUL,sequence_predictions.csv,stored sequence artifacts,20,fold scaler,cell-disjoint train/validation/test,see checkpoint metadata,,,partial
+Attention-LSTM-MoE,SOH/RUL,sequence_predictions.csv,stored sequence artifacts,20,fold scaler,cell-disjoint train/validation/test,see checkpoint metadata,,,partial
